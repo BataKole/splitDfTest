@@ -20,6 +20,7 @@ public class SplitDf {
         Dataset<Row> temp;
 
         long recordCount = totalDf.count();
+        System.out.println(recordCount);
         long residualRecords = 0;
 
         while(true) {
@@ -27,13 +28,15 @@ public class SplitDf {
             String A = "gfcid >= " + String.valueOf(i * 1000);
             String C = "gfcid <= " +  String.valueOf((i + 1) * 1000);
 
+            System.out.println(i);
 
             // If there is less than 1000 records left, take the rest of records   (residualRecords)
             if((i+1) * 1000 > recordCount) {
-                residualRecords = recordCount - (i + 1) * 100;
-                String B = "gfcid <= " + String.valueOf(i*1000 + residualRecords);
+
+                residualRecords = recordCount - (i * 1000);
+                String B = "gfcid <= " + String.valueOf((i * 1000)+ residualRecords);
+                System.out.println(A + " and " + B);
                 temp = totalDf.select(totalDf.col("*")).filter(A).filter(B);
-                break;
             } else {
                 // Take next 1000 records
                 temp = totalDf.select(totalDf.col("*")).filter(A).filter(C);
@@ -43,8 +46,11 @@ public class SplitDf {
             // Append temp DF to dfList
             dfList.add(temp);
 
+            // The loop finished traversal of totalDf
+            if((i+1) * 1000 > recordCount) break;
             // Increase the counter
             i++;
+
         }
     }
 
@@ -53,9 +59,7 @@ public class SplitDf {
 
         splitDf(totalDf);
 
-        totalDf.createOrReplaceTempView("totalDf");
-        Dataset<Row> list = session.getSpark().sql("SELECT * FROM totalDf");
-        list.show();
+
         return dfList;
     }
 }

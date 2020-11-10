@@ -18,7 +18,7 @@ public class Main {
 
         ArrayList<Dataset<Row>> dfList = splitDf.getDfList(jsonPath);
 
-        System.out.println("List lenght: " + dfList.size());
+        System.out.println("List length: " + dfList.size());
 
         for (Dataset<Row> df: dfList) {
             df.show();
