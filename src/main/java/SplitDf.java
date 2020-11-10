@@ -46,7 +46,7 @@ public class SplitDf {
             // Append temp DF to dfList
             dfList.add(temp);
 
-            // The loop finished traversal of totalDf
+            // The loop went through whole totalDf
             if((i+1) * 1000 > recordCount) break;
             // Increase the counter
             i++;
