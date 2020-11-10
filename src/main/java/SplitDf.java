@@ -20,22 +20,19 @@ public class SplitDf {
         Dataset<Row> temp;
 
         long recordCount = totalDf.count();
-        System.out.println(recordCount);
-        long residualRecords = 0;
+
+        long residualRecords;
 
         while(true) {
 
             String A = "gfcid >= " + String.valueOf(i * 1000);
             String C = "gfcid <= " +  String.valueOf((i + 1) * 1000);
 
-            System.out.println(i);
-
             // If there is less than 1000 records left, take the rest of records   (residualRecords)
             if((i+1) * 1000 > recordCount) {
 
                 residualRecords = recordCount - (i * 1000);
-                String B = "gfcid <= " + String.valueOf((i * 1000)+ residualRecords);
-                System.out.println(A + " and " + B);
+                String B = "gfcid <= " + String.valueOf((i * 1000)+ residualRecords);;
                 temp = totalDf.select(totalDf.col("*")).filter(A).filter(B);
             } else {
                 // Take next 1000 records
@@ -58,7 +55,6 @@ public class SplitDf {
         totalDf = session.loadDf(path);
 
         splitDf(totalDf);
-
 
         return dfList;
     }
