@@ -2,6 +2,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
+
 public class Session {
 
     private  SparkSession spark;
@@ -25,4 +26,6 @@ public class Session {
         return spark.read()
                 .json(path);
     }
+
+
 }

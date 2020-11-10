@@ -14,7 +14,7 @@ public class Main {
 
         SplitDf splitDf = new SplitDf();
 
-        String jsonPath = "./data/jsonTest.json";
+        String jsonPath = "./data/test.jsonl";
 
         ArrayList<Dataset<Row>> dfList = splitDf.getDfList(jsonPath);
 

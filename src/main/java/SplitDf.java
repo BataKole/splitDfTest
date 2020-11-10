@@ -24,14 +24,14 @@ public class SplitDf {
 
         while(true) {
 
-            String A = "id >= " + String.valueOf(i * 1000);
-            String C = "id <= " +  String.valueOf((i + 1) * 1000);
+            String A = "gfcid >= " + String.valueOf(i * 1000);
+            String C = "gfcid <= " +  String.valueOf((i + 1) * 1000);
 
 
             // If there is less than 1000 records left, take the rest of records   (residualRecords)
             if((i+1) * 1000 > recordCount) {
                 residualRecords = recordCount - (i + 1) * 100;
-                String B = "id <= " + String.valueOf(i*1000 + residualRecords);
+                String B = "gfcid <= " + String.valueOf(i*1000 + residualRecords);
                 temp = totalDf.select(totalDf.col("*")).filter(A).filter(B);
                 break;
             } else {
@@ -50,6 +50,12 @@ public class SplitDf {
 
     public ArrayList<Dataset<Row> > getDfList(String path){
         totalDf = session.loadDf(path);
+
+        splitDf(totalDf);
+
+        totalDf.createOrReplaceTempView("totalDf");
+        Dataset<Row> list = session.getSpark().sql("SELECT * FROM totalDf");
+        list.show();
         return dfList;
     }
 }
