@@ -7,54 +7,52 @@ public class SplitDf {
 
     Session session = new Session();
 
-    // List used to store Datasets, each containing 1000 records
+    // List used to store Datasets, each containing totalRecords / partsNum records
     private ArrayList<Dataset<Row>> dfList = new ArrayList<Dataset<Row>>();
+
 
     // first load whole Json file to totalDf. SparkSession will be used for file loading
     private Dataset<Row> totalDf ;
 
     // this method takes totalDf and splits it into equal Datasets and internally adds //Datasets to ListArray<Dataset<Row> >
-    private void splitDf(Dataset<Row> totalDf) {
+    private void splitDf(Dataset<Row> totalDf, int partsNum) {
 
         int i=0;
         Dataset<Row> temp;
 
         long recordCount = totalDf.count();
 
-        long residualRecords;
+        long partSize;
+        if(recordCount % partsNum == 0)
+            partSize = recordCount / partsNum;
+        else partSize = recordCount / partsNum +  1;
+
+
+        //long residualRecords;
 
         while(true) {
 
-            String A = "gfcid >= " + String.valueOf(i * 1000);
-            String C = "gfcid <= " +  String.valueOf((i + 1) * 1000);
+            String A = "gfcid >= " + String.valueOf(i * partSize);
+            String B = "gfcid <= " +  String.valueOf((i + 1) * partSize);
 
-            // If there is less than 1000 records left, take the rest of records   (residualRecords)
-            if((i+1) * 1000 > recordCount) {
-
-                residualRecords = recordCount - (i * 1000);
-                String B = "gfcid <= " + String.valueOf((i * 1000)+ residualRecords);;
-                temp = totalDf.select(totalDf.col("*")).filter(A).filter(B);
-            } else {
-                // Take next 1000 records
-                temp = totalDf.select(totalDf.col("*")).filter(A).filter(C);
-            }
-
+            temp = totalDf.select(totalDf.col("*")).filter(A).filter(B);
 
             // Append temp DF to dfList
             dfList.add(temp);
 
             // The loop went through whole totalDf
-            if((i+1) * 1000 > recordCount) break;
+            if((i+1) * partSize > recordCount) break;
             // Increase the counter
             i++;
 
         }
     }
 
-    public ArrayList<Dataset<Row> > getDfList(String path){
+    public ArrayList<Dataset<Row> > getDfList(String path,int partsNum){
         totalDf = session.loadDf(path);
 
-        splitDf(totalDf);
+        // Divide totalDf to partsNum DFs
+        splitDf(totalDf, partsNum);
 
         return dfList;
     }
